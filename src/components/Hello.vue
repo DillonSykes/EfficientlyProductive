@@ -20,15 +20,15 @@
         Choose activity to record
       </h3>
 
-      <div slot="body">
-        <select>
-          <option v-for="act in actList">{{ act }}</option>
+      <div slot="body" class="dropdown">
+        <select id="A">
+          <option v-for="act in actList">{{ act.name }} {{ act.pts }}</option>
         </select>
       </div>
       <div slot="footer">
         <button type="button" class="btn btn-outline-info" @click="earnEP()"> Close </button>
-        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="submitAndClose()">
-          Submit
+        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="submitEP()">
+          Redeem
         </button>
       </div>
     </modal>
@@ -42,8 +42,8 @@
     <button v-show="second" @click="newAct()">New Activity</button>
     <button v-show="second" @click="earnEP()">Earn EP</button>
     <button v-show="second">History</button>
-    <p v-show="second">Total EP: {{ totalEP }} </p>
-    <p v-show="second">Today's EP: {{ todaysEP }} </p>
+    <p v-show="second">Total EP: {{ this.totalEP }} </p>
+    <p v-show="second">Today's EP: {{ this.todaysEP }} </p>
 
   </div>
 </template>
@@ -64,10 +64,8 @@ export default {
         todaysEP: 0,
         showActModal: false,
         showEPModal: false,
-        act: {
-          name: '',
-          pts: 0
-        },
+        name: '',
+        pts: 0,
         actList: []
       }
     },
@@ -86,13 +84,28 @@ export default {
         this.showActModal = !this.showActModal
       },
       submitAndClose: function () {
-        this.act.name = document.getElementById('actName').value
-        this.act.pts = document.getElementById('actPts').value
-        this.actList.push(this.act)
+        function Act (aName, aPts) {
+          this.name = aName
+          this.pts = aPts
+        }
+        var n = document.getElementById('actName').value
+        var p = document.getElementById('actPts').value
+        var tmp = new Act(n, p)
+        this.actList.push(tmp)
         this.newAct()
       },
       earnEP: function () {
         this.showEPModal = !this.showEPModal
+      },
+      submitEP: function () {
+        this.earnEP()
+        var el = document.getElementById('A')
+        var tmp = el.options[el.selectedIndex].value
+        var rtmp = tmp.split(' ').pop()
+        var pts = parseInt(rtmp)
+        var rpts = parseInt(pts)
+        this.todaysEP += rpts
+        this.totalEP += rpts
       }
     },
     components: {
