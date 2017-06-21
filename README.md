@@ -1,7 +1,7 @@
 # efficiently-productive
 
-> Start of my webpage/n
-> Refer to wiki
+> Start of my webpage
+refer to wiki
 
 ## Build Setup
 
