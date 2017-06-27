@@ -1,5 +1,23 @@
 <template>
-  <div class="hello">
+  <div class="Home">
+    <modal v-if="showHistory">
+      <h1 slot="header" class="modal-title">
+        History
+      </h1>
+
+      <div slot="body">
+        <DataView>
+            <tr slot="name" v-for="act in history">
+              <th>{{ date.toLocaleDateString("en-US") }}</th>
+              <td> {{ act.name }} </td>
+              <td> {{ act.pts }} </td>
+            </tr>
+        </DataView>
+      </div>
+      <div slot="footer">
+        <button type="button" class="btn btn-outline-info" @click=" historyBtn()"> Close </button>
+      </div>
+    </modal>
     <modal v-if="showActModal">
       <h3 slot="header" class="modal-title">
         New Activity
@@ -32,26 +50,25 @@
         </button>
       </div>
     </modal>
-    <h1>{{ title }}</h1>
-    <h2>{{ msg }}</h2>
-    <button v-show="showEnter" @click="enterSite()">Enter!</button>
-    <h3 v-show="show">Enter Username:</h3>
-    <input v-show="show" id="pN" type="text">
-    <button v-show="show" @click="saveName()">Save</button>
-    <p v-show="second">What would you like todo?</p>
-    <button v-show="second" @click="newAct()">New Activity</button>
-    <button v-show="second" @click="earnEP()">Earn EP</button>
-    <button v-show="second">History</button>
-    <p v-show="second">Total EP: {{ this.totalEP }} </p>
-    <p v-show="second">Today's EP: {{ this.todaysEP }} </p>
+    <h1 class="text-center">{{ title }}</h1>
+    <h2 class="text-center">{{ msg }}</h2>
+    <div class="center-block">
+      <p v-show="second" class="text-center">What would you like todo?</p>
+      <button  @click="newAct()">New Activity</button>
+      <button  @click="earnEP()">Earn EP</button>
+      <button  @click="historyBtn()">History</button>
+      <p class="text-center">Total EP: {{ this.totalEP }} </p>
+      <p class="text-center">Today's EP: {{ this.todaysEP }} </p>
+    </div>
 
   </div>
 </template>
 
 <script>
   import modal from '@/components/modal.vue'
+  import DataView from '@/components/DataView.vue'
 export default {
-    name: 'hello',
+    name: 'Home',
     data () {
       return {
         title: 'Welcome to Efficiently-Productive',
@@ -64,9 +81,12 @@ export default {
         todaysEP: 0,
         showActModal: false,
         showEPModal: false,
+        showHistory: false,
         name: '',
         pts: 0,
-        actList: []
+        actList: [],
+        history: [],
+        date: new Date()
       }
     },
     methods: {
@@ -98,18 +118,29 @@ export default {
         this.showEPModal = !this.showEPModal
       },
       submitEP: function () {
+        function Act (aName, aPts) {
+          this.name = aName
+          this.pts = aPts
+        }
         this.earnEP()
         var el = document.getElementById('A')
         var tmp = el.options[el.selectedIndex].value
-        var rtmp = tmp.split(' ').pop()
-        var pts = parseInt(rtmp)
-        var rpts = parseInt(pts)
-        this.todaysEP += rpts
-        this.totalEP += rpts
+        var splitRa = tmp.split(' ')
+        var name = splitRa[0]
+        var pts = splitRa[1]
+        var actObj = new Act(name, pts) // Creates new activity obj to put into history array
+        this.history.push(actObj)
+        pts = parseInt(pts) // Change pts from string to int
+        this.todaysEP += pts
+        this.totalEP += pts
+      },
+      historyBtn: function () {
+        this.showHistory = !this.showHistory
       }
     },
     components: {
-      'modal': modal
+      'modal': modal,
+      'DataView': DataView
     }
   }
 </script>

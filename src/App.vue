@@ -1,23 +1,65 @@
+// src/App.vue
+
 <template>
-  <div id="app">
-    <router-view></router-view>
-    <hr>
+  <div>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header pull-right">
+          <h1>Efficiently Productive</h1>
+
+          <button
+            class="btn btn-primary btn-margin center-block"
+            v-if="!authenticated"
+            @click="login()">
+            Log In
+          </button>
+
+          <button
+            class="btn btn-primary btn-margin center-block"
+            v-if="authenticated"
+            @click="logout()">
+            Log Out
+          </button>
+
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <router-view
+        :auth="auth"
+        :authenticated="authenticated">
+      </router-view>
+    </div>
   </div>
 </template>
 
 <script>
-export default {
-  name: 'app'
-}
+
+  import AuthService from './auth/AuthService'
+
+  const auth = new AuthService()
+
+  const { login, logout, authenticated, authNotifier } = auth
+
+  export default {
+    name: 'app',
+    data () {
+      authNotifier.on('authChange', authState => {
+        this.authenticated = authState.authenticated
+      })
+      return {
+        auth,
+        authenticated
+      }
+    },
+    methods: {
+      login,
+      logout
+    }
+  }
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+  @import '../node_modules/bootstrap/dist/css/bootstrap.css';
 </style>
