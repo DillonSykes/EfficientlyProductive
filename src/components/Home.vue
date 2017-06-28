@@ -54,11 +54,42 @@
     <h2 class="text-center">{{ msg }}</h2>
     <div class="center-block">
       <p v-show="second" class="text-center">What would you like todo?</p>
-      <button  @click="newAct()">New Activity</button>
-      <button  @click="earnEP()">Earn EP</button>
-      <button  @click="historyBtn()">History</button>
-      <p class="text-center">Total EP: {{ this.totalEP }} </p>
-      <p class="text-center">Today's EP: {{ this.todaysEP }} </p>
+      <div class="card">
+        <!--<img class="card-img-top" src="/images/pathToYourImage.pngs" alt="Card image cap">-->
+        <div class="card-block">
+          <h4 class="card-title">Add Activities</h4>
+          <p class="card-text">
+            Here you can add new activities and assign them point values. (Weight them based on your own preference)
+          </p>
+          <button type="button" class="btn btn-primary btn-lg" @click="newAct()">New Activity</button>
+        </div>
+      </div>
+      <div class="card">
+        <!--<img class="card-img-top" src="/images/pathToYourImage.png" alt="Card image cap">-->
+        <div class="card-block">
+          <h4 class="card-title">Earn Efficiently Productive Points</h4>
+          <p class="card-text">
+            Here you can Add EP to your EP score, as you complete activities choose them from your unique list
+          </p>
+          <button type="button" class="btn btn-primary btn-lg" @click="earnEP()">Earn EP</button>
+        </div>
+      </div>
+      <div class="card">
+        <!--<img class="card-img-top" src="/images/pathToYourImage.png" alt="Card image cap">-->
+        <div class="card-block">
+          <h4 class="card-title">History</h4>
+          <p class="card-text">
+            Here you can look at your history, can you improve in any area?
+          </p>
+          <button type="button" class="btn btn-primary btn-lg" @click="historyBtn()">History</button>
+        </div>
+      </div>
+      <div class="alert alert-info" role="alert">
+        <strong>
+          <p class="text-center">Total EP: {{ this.totalEP }} </p>
+          <p class="text-center">Today's EP: {{ this.todaysEP }} </p>
+        </strong>
+      </div>
     </div>
 
   </div>
@@ -72,7 +103,7 @@ export default {
     data () {
       return {
         title: 'Welcome to Efficiently-Productive',
-        msg: 'Where being productive actually means something. Click to get started.',
+        msg: 'Where being productive actually means something.',
         show: false,
         showEnter: true,
         second: false,
