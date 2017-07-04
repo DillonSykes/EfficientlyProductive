@@ -1,0 +1,11 @@
+function isUser (auth, userKey) {
+    return auth.uid == userKey;
+}
+function isAdmin (auth) {
+    return root.child('users').child(auth.uid).child('isAdmin').val() == true;
+}
+
+path /users/{uid} {
+    read() { isUser(auth, uid) }
+    write() { isUser(auth, uid) }
+}

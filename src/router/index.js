@@ -1,27 +1,59 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Login from '@/components/Login'
-import Hello from '@/components/Home'
-import Callback from '@/components/Callback'
+import Home from '@/components/Home'
+import Auth from '@/components/Auth'
+import firebase from 'firebase'
 Vue.use(Router)
 
+function requireAuth (to, from, next) {
+  if (!firebase.auth().currentUser) {
+    console.log('User is not logged in')
+    next({
+      path: '/auth',
+      query: { redirect: '/Home' }
+    })
+  } else {
+    console.log('User is logged in:', firebase.auth().currentUser.uid)
+    next()
+  }
+}
 export default new Router({
   routes: [
     {
-      path: '/',
-      name: 'Login',
-      component: Login
-    },
-    {
       path: '/Home',
-      name: 'Home',
-      component: Hello
+      component: Home,
+      beforeEnter: requireAuth
     },
     {
-      path: '/callback',
-      name: 'Callback',
-      component: Callback
+      path: '/',
+      name: 'Auth',
+      component: Auth
     }
   ],
   mode: 'history'
 })
+// export default new Router({
+//   routes: [
+//     {
+//       path: '/',
+//       name: 'Auth',
+//       component: Auth
+//     },
+//     {
+//       path: '/auth',
+//       name: 'Auth',
+//       component: Auth
+//     },
+//     {
+//       path: '/success',
+//       name: 'AuthSuccess',
+//       component: AuthSuccess
+//     },
+//     {
+//       path: '/Home',
+//       name: 'Home',
+//       component: Home
+//     }
+//   ],
+//   mode: 'history'
+// })

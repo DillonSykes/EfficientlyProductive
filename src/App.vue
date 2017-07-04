@@ -1,65 +1,30 @@
-// src/App.vue
-
 <template>
-  <div>
-    <nav class="navbar navbar-default">
-      <div class="container-fluid">
-        <div class="navbar-header pull-right">
-          <h1>Efficiently Productive</h1>
-
-          <button
-            class="btn btn-primary btn-margin center-block"
-            v-if="!authenticated"
-            @click="login()">
-            Log In
-          </button>
-
-          <button
-            class="btn btn-primary btn-margin center-block"
-            v-if="authenticated"
-            @click="logout()">
-            Log Out
-          </button>
-
-        </div>
-      </div>
-    </nav>
-
-    <div class="container">
-      <router-view
-        :auth="auth"
-        :authenticated="authenticated">
-      </router-view>
+  <div id=”app” class="container">
+    <div class="page-header">
+      <h1 class="text-center">Efficiently Productive</h1>
     </div>
+    <div>
+      <router-view></router-view>
+    </div>
+    <button type="button" class="btn btn-default navbar-btn"> Username</button>
+    <button @click="logOut" type="button" class="btn btn-default navbar-btn">Sign out</button>
   </div>
 </template>
-
 <script>
-
-  import AuthService from './auth/AuthService'
-
-  const auth = new AuthService()
-
-  const { login, logout, authenticated, authNotifier } = auth
-
+  import firebase from 'firebase'
   export default {
     name: 'app',
     data () {
-      authNotifier.on('authChange', authState => {
-        this.authenticated = authState.authenticated
-      })
-      return {
-        auth,
-        authenticated
-      }
+      return {}
     },
     methods: {
-      login,
-      logout
+      logOut () {
+        firebase.auth().signOut()
+        this.$router.push('/auth')
+      }
     }
   }
 </script>
-
 <style>
   @import '../node_modules/bootstrap/dist/css/bootstrap.css';
 </style>

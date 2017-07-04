@@ -8,9 +8,8 @@
       <div slot="body">
         <DataView>
             <tr slot="name" v-for="act in history">
-              <th>{{ date.toLocaleDateString("en-US") }}</th>
-              <td> {{ act.name }} </td>
-              <td> {{ act.pts }} </td>
+              <th>Something</th>
+              <td> {{ JSON.stringify(act) }} </td> // wrong needs up date
             </tr>
         </DataView>
       </div>
@@ -23,8 +22,8 @@
         New Activity
       </h3>
       <div slot="body">
-        <input id="actName" type="text" placeholder="Enter Activity Name">
-        <input id="actPts" type="number" placeholder="# Of EP">
+        <input id="actName" type="text" placeholder="Enter Activity Name" v-model="actObj.title">
+        <input id="actPts" type="number" placeholder="# Of EP" v-model="actObj.points">
       </div>
       <div slot="footer">
         <button type="button" class="btn btn-outline-info" @click=" newAct()"> Close </button>
@@ -40,7 +39,7 @@
 
       <div slot="body" class="dropdown">
         <select id="A">
-          <option v-for="act in actList">{{ act.name }} {{ act.pts }}</option>
+          <option v-for="act in activities">{{ act.title }} {{ act.points }}</option>
         </select>
       </div>
       <div slot="footer">
@@ -98,8 +97,17 @@
 <script>
   import modal from '@/components/modal.vue'
   import DataView from '@/components/DataView.vue'
+  import firebase from 'firebase'
 export default {
     name: 'Home',
+    firebase () {
+      const userId = firebase.auth().currentUser.uid
+      return {
+        activities: firebase.database().ref('users/' + userId + '/myActs'),
+        pointsRef: firebase.database().ref('users/' + userId + '/points/totalPoints/total'),
+        historyRef: firebase.database().ref('users/' + userId + '/history')
+      }
+    },
     data () {
       return {
         title: 'Welcome to Efficiently-Productive',
@@ -108,60 +116,82 @@ export default {
         showEnter: true,
         second: false,
         userName: '',
-        totalEP: 0,
         todaysEP: 0,
+        totalEP: 0,
         showActModal: false,
         showEPModal: false,
         showHistory: false,
-        name: '',
-        pts: 0,
+        tmpObj: {
+          name: '',
+          pts: 0,
+          Odate: null,
+          fireDate: null
+        },
+        actObj: {
+          title: '',
+          points: 0
+        },
         actList: [],
         history: [],
-        date: new Date()
+        theDate: new Date().toLocaleDateString('en-US')
       }
     },
+    created () {
+      var pathA = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/points/total/points')
+      pathA.on('value', snap => {
+        this.totalEP = snap.val()
+      })
+      var pathB = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/points/today/points')
+      pathB.on('value', snap => {
+        this.todaysEP = snap.val()
+      })
+      var pathC = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/history/item')
+      this.history = pathC
+    },
     methods: {
-      enterSite: function () {
-        this.show = !this.show
-        this.showEnter = !this.showEnter
-      },
-      saveName: function () {
-        this.userName = document.getElementById('pN').value
-        this.msg = 'Welcome ' + this.userName
-        this.show = !this.show
-        this.second = !this.second
-      },
       newAct: function () {
         this.showActModal = !this.showActModal
       },
       submitAndClose: function () {
-        function Act (aName, aPts) {
-          this.name = aName
-          this.pts = aPts
-        }
-        var n = document.getElementById('actName').value
-        var p = document.getElementById('actPts').value
-        var tmp = new Act(n, p)
-        this.actList.push(tmp)
+        var path = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/myActs')
+        path.child(this.actObj.title).set(
+          {
+            title: this.actObj.title,
+            points: this.actObj.points
+          }
+        )
+        this.actObj.title = ''
+        this.actObj.points = 0
         this.newAct()
       },
       earnEP: function () {
         this.showEPModal = !this.showEPModal
       },
       submitEP: function () {
-        function Act (aName, aPts) {
-          this.name = aName
-          this.pts = aPts
-        }
         this.earnEP()
+        var pointsPath = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/points')
+        var historyPath = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/history')
         var el = document.getElementById('A')
         var tmp = el.options[el.selectedIndex].value
         var splitRa = tmp.split(' ')
         var name = splitRa[0]
         var pts = splitRa[1]
-        var actObj = new Act(name, pts) // Creates new activity obj to put into history array
-        this.history.push(actObj)
+        var date = this.theDate
+        var fdate = firebase.database.ServerValue.TIMESTAMP
+        this.tmpObj.name = name
+        this.tmpObj.pts = pts
+        this.tmpObj.Odate = date
+        this.tmpObj.fireDate = fdate
+        historyPath.push().child('item').set({
+          date: this.tmpObj.Odate,
+          points: this.tmpObj.pts,
+          title: this.tmpObj.name,
+          createdAt: this.tmpObj.fireDate
+        })
         pts = parseInt(pts) // Change pts from string to int
+        pointsPath.child('totalPoints').set(
+          pts
+        )
         this.todaysEP += pts
         this.totalEP += pts
       },
