@@ -1,4 +1,4 @@
-<template lang="html">
+<template>
   <div id="firebaseui-auth-container">
     <h1 class="text-center">Please sign in to view your account</h1>
   </div>

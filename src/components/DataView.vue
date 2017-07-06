@@ -1,17 +1,18 @@
 <template>
-  <table class="table table-striped">
-    <thead>
-    <tr>
-      <th>Date</th>
-      <th>Activity</th>
-      <th>Points</th>
-    </tr>
-    </thead>
-    <tbody>
-    <slot name="name"></slot>
-    </tbody>
-  </table>
-
+  <div style="height:300px;overflow:auto;">
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th>Date</th>
+        <th>Activity</th>
+        <th>Points</th>
+      </tr>
+      </thead>
+      <tbody>
+      <slot name="data"></slot>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <script>
@@ -22,3 +23,6 @@
     }
   }
 </script>
+<style>
+
+</style>

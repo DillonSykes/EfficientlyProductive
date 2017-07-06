@@ -32,28 +32,3 @@ export default new Router({
   ],
   mode: 'history'
 })
-// export default new Router({
-//   routes: [
-//     {
-//       path: '/',
-//       name: 'Auth',
-//       component: Auth
-//     },
-//     {
-//       path: '/auth',
-//       name: 'Auth',
-//       component: Auth
-//     },
-//     {
-//       path: '/success',
-//       name: 'AuthSuccess',
-//       component: AuthSuccess
-//     },
-//     {
-//       path: '/Home',
-//       name: 'Home',
-//       component: Home
-//     }
-//   ],
-//   mode: 'history'
-// })

@@ -7,14 +7,16 @@
 
       <div slot="body">
         <DataView>
-            <tr slot="name" v-for="act in history">
-              <th>Something</th>
-              <td> {{ JSON.stringify(act) }} </td> // wrong needs up date
+            <tr slot="data" v-for="act in this.historyRef">
+              <th> {{ act.item.date }} </th>
+              <td> {{ act.item.title }} </td>
+              <td> {{ act.item.points }} </td>
             </tr>
         </DataView>
       </div>
       <div slot="footer">
         <button type="button" class="btn btn-outline-info" @click=" historyBtn()"> Close </button>
+        <button type="button" class="btn btn-danger" @click="resetHistory()" style="float: left"> Clear all history</button>
       </div>
     </modal>
     <modal v-if="showActModal">
@@ -36,17 +38,34 @@
       <h3 slot="header" class="modal-title">
         Choose activity to record
       </h3>
-
       <div slot="body" class="dropdown">
-        <select id="A">
-          <option v-for="act in activities">{{ act.title }} {{ act.points }}</option>
-        </select>
+        <div class="panel-body">
+          <table class="table table-striped">
+            <thead>
+            <tr>
+              <th>Title</th>
+              <th>Points</th>
+              <th>Earn</th>
+              <th> Delete </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="act in activities">
+              <td>{{act.title}}</td>
+              <td>{{act.points}}</td>
+              <td>
+                <span class="glyphicon glyphicon-plus" v-on:click="submitEP(act)"></span>
+              </td>
+              <td>
+                <span class="glyphicon glyphicon-trash" v-on:click="deleteItem(act)"></span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
       <div slot="footer">
         <button type="button" class="btn btn-outline-info" @click="earnEP()"> Close </button>
-        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="submitEP()">
-          Redeem
-        </button>
       </div>
     </modal>
     <h1 class="text-center">{{ title }}</h1>
@@ -80,13 +99,13 @@
           <p class="card-text">
             Here you can look at your history, can you improve in any area?
           </p>
-          <button type="button" class="btn btn-primary btn-lg" @click="historyBtn()">History</button>
+          <button type="button" class="btn btn-primary btn-lg" @click="historyBtn(this.history)">History</button>
         </div>
       </div>
       <div class="alert alert-info" role="alert">
         <strong>
           <p class="text-center">Total EP: {{ this.totalEP }} </p>
-          <p class="text-center">Today's EP: {{ this.todaysEP }} </p>
+          <p class="text-center">Today's EP: !!COMING SOON!! </p>
         </strong>
       </div>
     </div>
@@ -98,13 +117,15 @@
   import modal from '@/components/modal.vue'
   import DataView from '@/components/DataView.vue'
   import firebase from 'firebase'
+  import toastr from 'toastr'
+
 export default {
     name: 'Home',
     firebase () {
       const userId = firebase.auth().currentUser.uid
       return {
         activities: firebase.database().ref('users/' + userId + '/myActs'),
-        pointsRef: firebase.database().ref('users/' + userId + '/points/totalPoints/total'),
+        pointsRef: firebase.database().ref('users/' + userId + '/points'),
         historyRef: firebase.database().ref('users/' + userId + '/history')
       }
     },
@@ -137,16 +158,14 @@ export default {
       }
     },
     created () {
-      var pathA = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/points/total/points')
+      var pathA = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/points/total')
       pathA.on('value', snap => {
         this.totalEP = snap.val()
       })
-      var pathB = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/points/today/points')
+      var pathB = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/points/today')
       pathB.on('value', snap => {
         this.todaysEP = snap.val()
       })
-      var pathC = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/history/item')
-      this.history = pathC
     },
     methods: {
       newAct: function () {
@@ -154,7 +173,12 @@ export default {
       },
       submitAndClose: function () {
         var path = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/myActs')
-        path.child(this.actObj.title).set(
+        if (Number.isNaN(this.actObj.points)) { // is not a number
+          toastr.error('Please enter a number')
+        } else { // is a number
+
+        }
+        path.child(this.actObj.title + ' ' + this.actObj.points).set(
           {
             title: this.actObj.title,
             points: this.actObj.points
@@ -167,15 +191,12 @@ export default {
       earnEP: function () {
         this.showEPModal = !this.showEPModal
       },
-      submitEP: function () {
+      submitEP: function (act) {
         this.earnEP()
         var pointsPath = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/points')
         var historyPath = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/history')
-        var el = document.getElementById('A')
-        var tmp = el.options[el.selectedIndex].value
-        var splitRa = tmp.split(' ')
-        var name = splitRa[0]
-        var pts = splitRa[1]
+        var name = act.title
+        var pts = act.points
         var date = this.theDate
         var fdate = firebase.database.ServerValue.TIMESTAMP
         this.tmpObj.name = name
@@ -188,15 +209,32 @@ export default {
           title: this.tmpObj.name,
           createdAt: this.tmpObj.fireDate
         })
-        pts = parseInt(pts) // Change pts from string to int
-        pointsPath.child('totalPoints').set(
+        pts = parseInt(pts) // Change pts from string to int *** may not need anymore ***
+        pts = pts + this.totalEP
+        pointsPath.child('total').set(
           pts
         )
-        this.todaysEP += pts
-        this.totalEP += pts
       },
-      historyBtn: function () {
+      historyBtn: function (anArray) {
         this.showHistory = !this.showHistory
+      },
+      getItemFromSelectList: function (id) {
+        var el = document.getElementById(id)
+        return el.options[el.selectedIndex].value
+      },
+      deleteItem: function (act) {
+        var actPath = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/myActs')
+        actPath.child(act['.key']).remove()
+        toastr.success(act.title + ' was removed from list of activities')
+      },
+      resetHistory: function () {
+        if (window.confirm('Are you sure you want to proceed, History will be deleted FOREVER!')) {
+          var historyPath = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/history')
+          historyPath.remove()
+          toastr.success('History Deleted!')
+        } else {
+          toastr.info('Delete Action Cancelled!')
+        }
       }
     },
     components: {

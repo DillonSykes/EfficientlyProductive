@@ -6,7 +6,7 @@
     <div>
       <router-view></router-view>
     </div>
-    <button type="button" class="btn btn-default navbar-btn"> Username</button>
+    <button type="button" class="btn btn-default navbar-btn">{{ this.user }}</button>
     <button @click="logOut" type="button" class="btn btn-default navbar-btn">Sign out</button>
   </div>
 </template>
@@ -15,12 +15,15 @@
   export default {
     name: 'app',
     data () {
-      return {}
+      return {
+        user: firebase.auth().currentUser.displayName
+      }
     },
     methods: {
       logOut () {
         firebase.auth().signOut()
-        this.$router.push('/auth')
+        this.$router.push('/')
+        this.user = ''
       }
     }
   }
