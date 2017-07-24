@@ -131,8 +131,8 @@ export default {
     },
     data () {
       return {
-        title: 'Welcome to Efficiently-Productive',
-        msg: 'Where being productive actually means something.',
+        title: 'Welcome to HabitTrack',
+        msg: 'Where you build good habits and weed out the bad.',
         show: false,
         showEnter: true,
         second: false,
@@ -157,6 +157,9 @@ export default {
         theDate: new Date().toLocaleDateString('en-US')
       }
     },
+    beforeMount () {
+      this.setDate()
+    },
     created () {
       var pathA = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/points/total')
       pathA.on('value', snap => {
@@ -173,11 +176,6 @@ export default {
       },
       submitAndClose: function () {
         var path = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/myActs')
-        if (Number.isNaN(this.actObj.points)) { // is not a number
-          toastr.error('Please enter a number')
-        } else { // is a number
-
-        }
         path.child(this.actObj.title + ' ' + this.actObj.points).set(
           {
             title: this.actObj.title,
@@ -192,7 +190,6 @@ export default {
         this.showEPModal = !this.showEPModal
       },
       submitEP: function (act) {
-        this.earnEP()
         var pointsPath = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/points')
         var historyPath = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/history')
         var name = act.title
@@ -214,6 +211,7 @@ export default {
         pointsPath.child('total').set(
           pts
         )
+        toastr.success(this.tmpObj.name + ' was recorded')
       },
       historyBtn: function (anArray) {
         this.showHistory = !this.showHistory
@@ -235,6 +233,12 @@ export default {
         } else {
           toastr.info('Delete Action Cancelled!')
         }
+      },
+      setDate: function () {
+        var dateRef = firebase.database().ref()
+        dateRef.child('date').push().set({
+          date: new Date()
+        })
       }
     },
     components: {
