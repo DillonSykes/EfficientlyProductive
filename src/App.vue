@@ -9,7 +9,7 @@
           <br/>
           <br/>
           1. To track productivity on a daily basis by adding activities and assigning them points.
-             As weeks go by you can start to notice trends such as maybe on wednesdays you dont complete as many tasks as you'd like.
+             As weeks go by you can start to notice trends such as maybe on wednesdays you don't complete as many tasks as you'd like.
           <br/>
           <br/>
           2. One can use this site as a habit tracker adding positive habits worth " + " points (e.g. going to the gym +30 points) or negative
@@ -21,7 +21,7 @@
       </div>
     </modal>
     <div class="page-header">
-      <h1 class="text-center">HabitTrack</h1>
+      <h1 class="text-center">KnowMyHabits</h1>
     </div>
     <div>
       <router-view></router-view>

@@ -73,7 +73,6 @@
     <div class="center-block">
       <p v-show="second" class="text-center">What would you like todo?</p>
       <div class="card">
-        <!--<img class="card-img-top" src="/images/pathToYourImage.pngs" alt="Card image cap">-->
         <div class="card-block">
           <h4 class="card-title">Add Activities</h4>
           <p class="card-text">
@@ -83,7 +82,6 @@
         </div>
       </div>
       <div class="card">
-        <!--<img class="card-img-top" src="/images/pathToYourImage.png" alt="Card image cap">-->
         <div class="card-block">
           <h4 class="card-title">Earn Efficiently Productive Points</h4>
           <p class="card-text">
@@ -93,7 +91,6 @@
         </div>
       </div>
       <div class="card">
-        <!--<img class="card-img-top" src="/images/pathToYourImage.png" alt="Card image cap">-->
         <div class="card-block">
           <h4 class="card-title">History</h4>
           <p class="card-text">
@@ -131,7 +128,7 @@ export default {
     },
     data () {
       return {
-        title: 'Welcome to HabitTrack',
+        title: 'Welcome to KnowMyHabits',
         msg: 'Where you build good habits and weed out the bad.',
         show: false,
         showEnter: true,
